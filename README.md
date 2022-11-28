@@ -2,15 +2,7 @@
 
 
 ## Overview
-SimCLS is a conceptually simple while empirically powerful framework for abstractive summarization, which can bridge the gap between the *learning objective* and *evaluation metrics* resulting from the currently dominated sequence-to-sequence learning framework by **formulating text generation as a reference-free evaluation problem} (i.e., quality estimation)** assisted by *contrastive learning*.
-
-As shown below, SimCLS framework consists of for two stages: Candidate Generation and Reference-free evaluation, where Doc, S, Ref} represent the document, generated summary and reference respectively.
-
-<div  align="center">
- <img src="example/intro_simcls.png" width = "550" alt="d" align=center />
-</div>
-
-
+This is a replica of SimCLS paper, but you can easily use this repo to build your own seq2seq model using SimCLS archietcture.
 
 
 ## 1. How to Install
