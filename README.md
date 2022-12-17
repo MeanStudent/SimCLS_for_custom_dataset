@@ -1,6 +1,6 @@
 # SimCLS for custom dataset and experiment on paper titling task
 ---
-Junsheng Shi<sup>*</sup>, Kaiyu He<sup>*</sup>
+KaiYu He<sup>1</sup>, BingZhe Jin<sup>2</sup>
 
 
 ## Overview
