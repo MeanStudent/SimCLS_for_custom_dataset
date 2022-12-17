@@ -5,6 +5,7 @@ KaiYu He<sup>1</sup>, BingZhe Jing<sup>2</sup>
 
 ## Overview
 This repo is a replica of [SimCLS](https://arxiv.org/abs/2106.01890v1) for abstract text summarization. Unlike the original source code, we add some code for generating summary candidates and simplifying the training process. And we also tried this framework with different architecture including deBerta and Bert as scorers for our covid paper titling task.
+Lacking of computational power, the generative model we use is a [T5_small ](https://huggingface.co/t5-small) finetuned on our dataset.
 
 
 ## 1. How to Install
@@ -16,11 +17,12 @@ This repo is a replica of [SimCLS](https://arxiv.org/abs/2106.01890v1) for abstr
 - `compare_mt` -> https://github.com/neulab/compare-mt
 
 ### Description of Codes
-- `main.py` -> training and evaluation procedure
+- `main.py` -> training model
 - `model.py` -> models
 - `data_utils.py` -> dataloader
 - `utils.py` -> utility functions
 - `preprocess.py` -> data preprocessing
+- `generat_cand.py`
 
 ### Workspace
 Following directories should be created for our experiments.
