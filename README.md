@@ -75,8 +75,20 @@ python evaluate_model.py --generator_name {args.generator_name} --dataset_name {
 
 ## 4. Results
 
-### CNNDM
+### RoBERTa scorer
 |          | ROUGE-1 | ROUGE-2 | ROUGE-L |
 |----------|---------|---------|---------|
 | Before SimCLS | 0.4298  | 0.2275   | 0.3709   |
-| After SimCLS  | 0.4105   | 0.1972   | 0.3445   |
+| After SimCLS  | 0.4105  | 0.1972   | 0.3445   |
+
+### DeBERTa scorer
+|          | ROUGE-1 | ROUGE-2 | ROUGE-L |
+|----------|---------|---------|---------|
+| Before SimCLS | 0.4298  | 0.2275   | 0.3709   |
+| After SimCLS  | 0.4105  | 0.1972   | 0.3445   |
+
+### BERT scorer
+|          | ROUGE-1 | ROUGE-2 | ROUGE-L |
+|----------|---------|---------|---------|
+| Before SimCLS | 0.4298  | 0.2275   | 0.3709   |
+| After SimCLS  | 0.4105  | 0.1972   | 0.3445   |
