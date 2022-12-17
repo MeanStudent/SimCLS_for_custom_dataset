@@ -18,12 +18,14 @@ Lacking of computational power, the generative model we use is a [T5_small ](htt
 - `compare_mt` -> https://github.com/neulab/compare-mt
 
 ### Description of Codes
-- `main.py` -> training model
+- `main.py` -> training scorer model
 - `model.py` -> models
 - `data_utils.py` -> dataloader
 - `utils.py` -> utility functions
 - `preprocess.py` -> data preprocessing
-- `generat_cand.py`
+- `generat_cand.py` -> generate candidate summaries for training
+- `finetune_model.py` -> finetune your own generative model
+- `evaluate_model.py` -> evalualte model with trained scorer
 
 ### Workspace
 Following directories should be created for our experiments.
@@ -31,10 +33,9 @@ Following directories should be created for our experiments.
 - `./result` -> storing evaluation results
 
 ## 2. Preprocessing
-We use the following datasets for our experiments.
+Need to know that the dataset in this repo [clean_covid.csv](clean_covid.csv) is just a sample dataset only contain 10000 records, if you want to access to the full data, please refer to the following link.
 
-- CNN/DailyMail -> https://github.com/abisee/cnn-dailymail
-- XSum -> https://github.com/EdinburghNLP/XSum
+- [The COVID-19 Open Research Dataset.](https://learn.microsoft.com/en-us/azure/open-datasets/dataset-covid-19-open-research?tabs=azure-storage)
 
 For data preprocessing, please run
 ```
