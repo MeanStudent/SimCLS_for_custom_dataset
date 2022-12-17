@@ -27,37 +27,35 @@ Lacking of computational power, the generative model we use is a [T5_small ](htt
 ### Workspace
 Following directories should be created for our experiments.
 - `./cache` -> storing model checkpoints
-- `./result` -> storing evaluation results
-
-## 2. Preprocessing
+## 2. Dataset
 Need to know that the dataset in this repo [clean_covid.csv](clean_covid.csv) is just a sample dataset only contain 10000 records, if you want to access to the full data, please refer to the following link.
 
 - [The COVID-19 Open Research Dataset.](https://learn.microsoft.com/en-us/azure/open-datasets/dataset-covid-19-open-research?tabs=azure-storage)
+
+## 2. Generating candidates
+
+To generate candidates please run:
+```
+!python gen_candidate.py --generator_name {args.generator_name} --dataset_name {args.dataset_name} --dataset_percent {args.dataset_percent} --num_cands {args.num_cands}
+```
+**generator_name**: is the path to previously finetuned generator. Here in our case we use a T5_small model finetuned on CORD dataset.
+**dataset_name**: is the path to dataset. (need to be a csv file, and column name for source document should be **abstract**, column name for reference summary should be **title**)
+**dataset_percent**: percent of data are used to generate, for test you can use smal percent of dataset to debug. Default to 100.
+**num_cands**: Num of candidates you want to generate.
+
+Generated candidate are stored in the forder 'candidates/{args.generator_name}_{args.num_cands}'
 
 For data preprocessing, please run
 ```
 python preprocess.py --src_dir [path of the raw data] --tgt_dir [output path] --split [train/val/test] --cand_num [number of candidate summaries]
 ```
-`src_dir` should contain the following files (using test split as an example):
-- `test.source`
-- `test.source.tokenized`
-- `test.target`
-- `test.target.tokenized`
-- `test.out`
-- `test.out.tokenized`
+`src_dir` is the candidate folder: 'candidates/{args.generator_name}_{args.num_cands}'.
 
 Each line of these files should contain a sample. In particular, you should put the candidate summaries for one data sample at neighboring lines in `test.out` and `test.out.tokenized`.
 
 The preprocessing precedure will store the processed data as seperate json files in `tgt_dir`.
 
-We have provided an example file in `./example`.
-
 ## 3. How to Run
-
-### Preprocessed Data
-You can download the preprocessed data for our experiments on [CNNDM](https://drive.google.com/file/d/1WRvDBWfmC5W_32wNRrNa6lEP75Vx5cut/view?usp=sharing) and [XSum](https://drive.google.com/file/d/1nKx6RT4zNxO4hFy8y3dPbYV-GBu1Si-u/view?usp=sharing).
-
-After donwloading, you should unzip the zip files in this root directory.
 
 ### Hyper-parameter Setting
 You may specify the hyper-parameters in `main.py`.
