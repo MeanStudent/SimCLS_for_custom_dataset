@@ -43,7 +43,6 @@ def base_setting(args):
     args.max_lr = getattr(args, "max_lr", 2e-3)
     args.scale = getattr(args, "scale", 1)
     args.datatype = getattr(args, "datatype", "diverse")
-    args.dataset = getattr(args, "dataset", "xsum")
     args.max_len = getattr(args, "max_len", 120)  # 120 for cnndm and 80 for xsum
     args.max_num = getattr(args, "max_num", 16)
     args.cand_weight = getattr(args, "cand_weight", 1)
@@ -56,6 +55,10 @@ def evaluation(args):
     tok = RobertaTokenizer.from_pretrained(args.model_type)
     collate_fn = partial(collate_mp, pad_token_id=tok.pad_token_id, is_test=True)
     test_set = ReRankingDataset(f"./{args.dataset}/{args.datatype}/test", args.model_type, is_test=True, maxlen=512, is_sorted=False, maxnum=args.max_num, is_untok=True)
+    print(test_set)
+    for i,v in enumerate(test_set):
+        if i<10:
+            print(v)
     dataloader = DataLoader(test_set, batch_size=8, shuffle=False, num_workers=4, collate_fn=collate_fn)
     # build models
     model_path = args.pretrained if args.pretrained is not None else args.model_type
@@ -203,7 +206,7 @@ def run(rank, args):
         s_optimizer.zero_grad()
         step_cnt = 0
         sim_step = 0
-        avg_loss = 0=
+        avg_loss = 0
         for (i, batch) in enumerate(dataloader):
             if args.cuda:
                 to_cuda(batch, gpuid)
@@ -251,7 +254,7 @@ def run(rank, args):
                     recorder.print("best - epoch: %d, batch: %d"%(epoch, i / args.accumulate_step))
                 if is_master:
                     recorder.print("val rouge: %.6f"%(1 - loss))
-               
+
 
 def main(args):
     # set env
@@ -271,6 +274,7 @@ if __name__ ==  "__main__":
     parser.add_argument("-p", "--port", type=int, default=12355)
     parser.add_argument("--model_pt", default="", type=str)
     parser.add_argument("--encode_mode", default=None, type=str)
+    parser.add_argument("--dataset", default=None, type=str)
     args = parser.parse_args()
     if args.cuda is False:
         if args.evaluate:
