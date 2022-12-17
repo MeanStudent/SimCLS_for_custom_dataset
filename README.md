@@ -1,7 +1,4 @@
 # SimCLS for custom dataset and experiment on paper titling task
----
-KaiYu He<sup>1</sup>, BingZhe Jing<sup>2</sup>
-
 
 ## Overview
 This repo is a replica of [SimCLS](https://arxiv.org/abs/2106.01890v1) for abstract text summarization. Unlike the original source code, we add some code for generating summary candidates and simplifying the training process. And we also tried this framework with different architecture including deBerta and Bert as scorers for our covid paper titling task.
