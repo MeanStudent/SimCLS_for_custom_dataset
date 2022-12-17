@@ -1,4 +1,4 @@
-# SimCLS for custom dataset
+# SimCLS for custom dataset and experiment on paper titling task
 ---
 Train your own SimCLS scorer from strach using custom dataset
 
