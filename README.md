@@ -1,8 +1,10 @@
-# SimCLS: A Simple Framework for Contrastive Learning of Abstractive Summarization (ACL 2021)
+# SimCLS for custom dataset
+---
+Train your own SimCLS scorer from strach using custom dataset
 
 
 ## Overview
-This is a replica of SimCLS paper, but you can easily use this repo to build your own seq2seq model using SimCLS archietcture.
+This repo is a replica of [SimCLS](https://arxiv.org/abs/2106.01890v1) for abstract text summarization. Unlike the original source code, we add some code for generating summary candidates and simplifying the training process. And we also tried this framework with different architecture including deBerta and Bert as scorers for our covid paper titling task.
 
 
 ## 1. How to Install
