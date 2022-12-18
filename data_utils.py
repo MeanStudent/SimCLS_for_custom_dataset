@@ -5,7 +5,7 @@ import numpy as np
 import torch
 from functools import partial
 import time
-from transformers import RobertaTokenizer
+from transformers import RobertaTokenizer, AutoTokenizer
 import random
 import pickle
 import copy
@@ -60,7 +60,7 @@ class ReRankingDataset(Dataset):
             with open(fdir) as f:
                 self.files = [x.strip() for x in f]
             self.num = len(self.files)
-        self.tok = RobertaTokenizer.from_pretrained(model_type, verbose=False)
+        self.tok = AutoTokenizer.from_pretrained(model_type, verbose=False)
         self.maxlen = maxlen
         self.is_test = is_test
         self.pad_token_id = self.tok.pad_token_id

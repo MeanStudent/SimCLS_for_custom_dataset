@@ -11,7 +11,7 @@ from transformers import (
     DataCollatorForSeq2Seq,
     AutoModel,
     RobertaModel, 
-    RobertaTokenizer
+    RobertaTokenizer,
 )
 from tabulate import tabulate
 import model
@@ -42,33 +42,40 @@ def batch_tokenize_preprocess(batch, tokenizer, max_source_length, max_target_le
         for l in target_tokenized["input_ids"]
     ]
     return batch
+
 def to_tensor(ids):
     return torch.tensor(ids, dtype=torch.long).to('cuda')
 
 def evaluate_without_SimCLS(generator, test_data_txt, cand_num, show_results):
     rouge_scorer = RougeScorer(['rouge1', 'rouge2', 'rougeLsum'], use_stemmer=True)
     doc_txt = test_data_txt['abstract']
-    doc_ids = generator_tokenizer.batch_encode_plus(doc_txt, max_length = 512, pad_to_max_length=True)['input_ids']
-    doc_ids = to_tensor(doc_ids)
-    doc_input_mask = doc_ids != scorer_tokenizer.pad_token_id
-    doc_out = scorer.encoder(doc_ids, attention_mask=doc_input_mask)['last_hidden_state']
-    doc_emb = torch.mean(doc_out,dim = 1) # average over all word embeddings
-    
     ref_txt = test_data_txt['title']
-    ref_ids = generator_tokenizer.batch_encode_plus(ref_txt, max_length = 512, pad_to_max_length=True)['input_ids']
-    ref_ids = to_tensor(ref_ids)
-    ref_input_mask = ref_ids != scorer_tokenizer.pad_token_id
-    ref_out = scorer.encoder(ref_ids, attention_mask=ref_input_mask)['last_hidden_state']
-    ref_emb = torch.mean(ref_out,dim = 1) 
-    
-    cand_id = generator.generate(doc_ids,num_beams = 16,
+    # generate candidates
+    doc_gen_ids = generator_tokenizer.batch_encode_plus(doc_txt, max_length = 512, pad_to_max_length=True)['input_ids']
+    doc_gen_ids = to_tensor(doc_gen_ids)
+    cand_id = generator.generate(doc_gen_ids,num_beams = 16,
                                      #no_repeat_ngram_size=2,
                                      diversity_penalty=1.0,
                                      max_length = 20,
                                      num_beam_groups = cand_num,
                                      num_return_sequences = 1)
     cands_txt = generator_tokenizer.batch_decode(cand_id, skip_special_tokens=True)
-    candidate_id = cand_id.view(-1, cand_id.size(-1))
+    
+    # scorer part
+    doc_ids = scorer_tokenizer.batch_encode_plus(doc_txt, max_length = 512, pad_to_max_length=True)['input_ids']
+    doc_ids = to_tensor(doc_ids)
+    doc_input_mask = doc_ids != scorer_tokenizer.pad_token_id
+    doc_out = scorer.encoder(doc_ids, attention_mask=doc_input_mask)['last_hidden_state']
+    doc_emb = torch.mean(doc_out,dim = 1) # average over all word embeddings
+    
+    ref_ids = scorer_tokenizer.batch_encode_plus(ref_txt, max_length = 512, pad_to_max_length=True)['input_ids']
+    ref_ids = to_tensor(ref_ids)
+    ref_input_mask = ref_ids != scorer_tokenizer.pad_token_id
+    ref_out = scorer.encoder(ref_ids, attention_mask=ref_input_mask)['last_hidden_state']
+    ref_emb = torch.mean(ref_out,dim = 1)     
+
+    candidate_id = scorer_tokenizer.batch_encode_plus(cands_txt, max_length = 512, pad_to_max_length=True)['input_ids']
+    candidate_id = to_tensor(candidate_id)
     cand_input_mask = candidate_id != scorer_tokenizer.pad_token_id
     cand_out = scorer.encoder(candidate_id, attention_mask=cand_input_mask)['last_hidden_state'] 
     candidate_embs = torch.mean(cand_out,dim = 1)
@@ -98,41 +105,43 @@ def evaluate_without_SimCLS(generator, test_data_txt, cand_num, show_results):
                     'ref_similar':ref_similarity_score}
     
     return regular_scores,cands_txt
-
 def evaluate_SimCLS(generator, generator_tokenizer, scorer, scorer_tokenizer, 
                     test_data_txt, cand_num, show_piece_of_data):
-    # generate batch data
     rouge_scorer = RougeScorer(['rouge1', 'rouge2', 'rougeLsum'], use_stemmer=True)
-    # 1, encode doc
     doc_txt = test_data_txt['abstract']
-    doc_ids = generator_tokenizer.batch_encode_plus(doc_txt, max_length = 512, pad_to_max_length=True)['input_ids']
-    doc_ids = to_tensor(doc_ids)
-    # 2, encode true sum
     ref_txt = test_data_txt['title']
-    ref_ids = generator_tokenizer.batch_encode_plus(ref_txt, max_length = 512, pad_to_max_length=True)['input_ids']
-    ref_ids = to_tensor(ref_ids)
-    # 3, generate cands
-    cands_ids = generator.generate(doc_ids,num_beams = cand_num,
+    
+    # generate candidates
+    doc_gen_ids = generator_tokenizer.batch_encode_plus(doc_txt, max_length = 512, pad_to_max_length=True)['input_ids']
+    doc_gen_ids = to_tensor(doc_gen_ids)
+    cands_ids = generator.generate(doc_gen_ids,num_beams = cand_num,
                                      #no_repeat_ngram_size=2,
                                      diversity_penalty=1.0,
                                      max_length = 20,
                                      num_beam_groups = cand_num,
                                      num_return_sequences = cand_num)
     cands_txt = generator_tokenizer.batch_decode(cands_ids, skip_special_tokens=True)
+    
+    # emb doc ref candidates
     # 4, get sentence embeddings
         # doc emb
+    doc_ids = scorer_tokenizer.batch_encode_plus(doc_txt, max_length = 512, pad_to_max_length=True)['input_ids']
+    doc_ids = to_tensor(doc_ids)
     doc_input_mask = doc_ids != scorer_tokenizer.pad_token_id
     doc_out = scorer.encoder(doc_ids, attention_mask=doc_input_mask)['last_hidden_state']
     doc_emb = torch.mean(doc_out,dim = 1) # average over all word embeddings
         # cands emb
-    candidate_id = cands_ids.view(-1, cands_ids.size(-1))
+    candidate_id = scorer_tokenizer.batch_encode_plus(cands_txt, max_length = 512, pad_to_max_length=True)['input_ids']
+    candidate_id = to_tensor(candidate_id)
     cand_input_mask = candidate_id != scorer_tokenizer.pad_token_id
     cand_out = scorer.encoder(candidate_id, attention_mask=cand_input_mask)['last_hidden_state'] 
     candidate_embs = torch.mean(cand_out,dim = 1)
         # ref emb
+    ref_ids = scorer_tokenizer.batch_encode_plus(ref_txt, max_length = 512, pad_to_max_length=True)['input_ids']
+    ref_ids = to_tensor(ref_ids)
     ref_input_mask = ref_ids != scorer_tokenizer.pad_token_id
     ref_out = scorer.encoder(ref_ids, attention_mask=ref_input_mask)['last_hidden_state']
-    ref_emb = torch.mean(ref_out,dim = 1) 
+    ref_emb = torch.mean(ref_out,dim = 1)  
     
     similarity_scores = []
     rouge1_scores = []
@@ -159,7 +168,6 @@ def evaluate_SimCLS(generator, generator_tokenizer, scorer, scorer_tokenizer,
                     'ref_similar': ref_similarity_score}
     
     return top1_scores, cands_txt, max_index
-
 if __name__ == '__main__':
     #parameters needed: 1, generator name 2, scorer name 3, dataset name 4, gen_candidate 5, max_len
     parser = argparse.ArgumentParser(description='Candidate generate parameter')
@@ -206,7 +214,7 @@ if __name__ == '__main__':
     print('start loading scorer model')
     scorer_name = args.scorer_architecture_name
     pt_scorer_path = args.scorer_path
-    scorer_tokenizer = RobertaTokenizer.from_pretrained(scorer_name)
+    scorer_tokenizer = AutoTokenizer.from_pretrained(scorer_name)
     scorer = model.ReRanker(scorer_name, scorer_tokenizer.pad_token_id)
     scorer.load_state_dict(torch.load(pt_scorer_path,map_location=torch.device(device)))
     scorer.to(device)
@@ -234,7 +242,6 @@ if __name__ == '__main__':
         rouge1_noSimCLS.append(regular_scores['rouge1'])
         rouge2_noSimCLS.append(regular_scores['rouge2'])
         rougeL_noSimCLS.append(regular_scores['rougeL'])
-
 
         SimCLS_sores, cands_txt, top1_index = evaluate_SimCLS(generator, generator_tokenizer, scorer, 
                         scorer_tokenizer, test_data_txt[i:i+1], args.num_cands, False)

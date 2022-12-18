@@ -6,11 +6,12 @@ from torch.utils.tensorboard import SummaryWriter
 from datetime import datetime
 
 class Recorder():
-    def __init__(self, id, log=True):
+    def __init__(self, id, log=True, model='roberta-base'):
         self.log = log
         now = datetime.now()
         date = now.strftime("%y-%m-%d")
-        self.dir = f"./cache/{date}-{id}"
+        self.dir = f"./cache/{date}-{id}-{model.replace('/', '-')}"
+        # self.dir = f"./cache/{model}-1217"
         if self.log:
             os.mkdir(self.dir)
             self.f = open(os.path.join(self.dir, "log.txt"), "w")

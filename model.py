@@ -1,7 +1,7 @@
 # modified from https://github.com/maszhongming/MatchSum
 import torch
 from torch import nn
-from transformers import RobertaModel
+from transformers import RobertaModel, AutoModel
 
 ## core loss function,需要提前传入h()function算出的分数
 def RankingLoss(score, summary_score=None, margin=0, gold_margin=0, gold_weight=1, no_gold=False, no_cand=False):
@@ -36,7 +36,7 @@ def RankingLoss(score, summary_score=None, margin=0, gold_margin=0, gold_weight=
 class ReRanker(nn.Module):
     def __init__(self, encoder, pad_token_id):
         super(ReRanker, self).__init__()
-        self.encoder = RobertaModel.from_pretrained(encoder)
+        self.encoder = AutoModel.from_pretrained(encoder)
         self.pad_token_id = pad_token_id
 
     def forward(self, text_id, candidate_id, summary_id=None, require_gold=True):

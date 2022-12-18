@@ -11,7 +11,7 @@ import os
 import json
 import random
 from compare_mt.rouge.rouge_scorer import RougeScorer
-from transformers import RobertaModel, RobertaTokenizer
+from transformers import RobertaModel, RobertaTokenizer, AutoTokenizer
 from utils import Recorder
 from data_utils import to_cuda, collate_mp, ReRankingDataset
 from torch.utils.data import DataLoader
@@ -52,7 +52,7 @@ def base_setting(args):
 def evaluation(args):
     # load data
     base_setting(args)
-    tok = RobertaTokenizer.from_pretrained(args.model_type)
+    tok = AutoTokenizer.from_pretrained(args.model_type)
     collate_fn = partial(collate_mp, pad_token_id=tok.pad_token_id, is_test=True)
     test_set = ReRankingDataset(f"./{args.dataset}/{args.datatype}/test", args.model_type, is_test=True, maxlen=512, is_sorted=False, maxnum=args.max_num, is_untok=True)
     print(test_set)
@@ -167,8 +167,8 @@ def run(rank, args):
     world_size = len(args.gpuid)
     if is_master:
         id = len(os.listdir("./cache"))
-        recorder = Recorder(id, args.log)
-    tok = RobertaTokenizer.from_pretrained(args.model_type)
+        recorder = Recorder(id, args.log, args.model_type)
+    tok = AutoTokenizer.from_pretrained(args.model_type)
     collate_fn = partial(collate_mp, pad_token_id=tok.pad_token_id, is_test=False)
     collate_fn_val = partial(collate_mp, pad_token_id=tok.pad_token_id, is_test=True)
     train_set = ReRankingDataset(f"./{args.dataset}/{args.datatype}/train", args.model_type, maxlen=args.max_len, maxnum=args.max_num)
@@ -275,6 +275,7 @@ if __name__ ==  "__main__":
     parser.add_argument("--model_pt", default="", type=str)
     parser.add_argument("--encode_mode", default=None, type=str)
     parser.add_argument("--dataset", default=None, type=str)
+    parser.add_argument("--model_type", default='roberta-base', type=str)
     args = parser.parse_args()
     if args.cuda is False:
         if args.evaluate:
