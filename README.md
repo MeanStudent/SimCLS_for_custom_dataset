@@ -75,7 +75,7 @@ python evaluate_model.py --generator_name {args.generator_name} --dataset_name {
 
 ## 4. Results
 
-### RoBERTa scorer
+<!-- ### RoBERTa scorer
 |          | ROUGE-1 | ROUGE-2 | ROUGE-L |
 |----------|---------|---------|---------|
 | Before SimCLS | 0.4298  | 0.2275   | 0.3709   |
@@ -91,4 +91,25 @@ python evaluate_model.py --generator_name {args.generator_name} --dataset_name {
 |          | ROUGE-1 | ROUGE-2 | ROUGE-L |
 |----------|---------|---------|---------|
 | Before SimCLS | 0.4298  | 0.2275   | 0.3709   |
-| After SimCLS  | 0.4105  | 0.1972   | 0.3445   |
+| After SimCLS  | 0.4105  | 0.1972   | 0.3445   | -->
+
+
+### T5 small model untuned on Covid Dataset
+|        | Before SimCLS | RoBERTa-8 |
+| ------ | ------------- | --------- |
+| Rouge1 | 0.2288        | 0.2269    |
+| Rouge2 | 0.0764        | 0.0735    |
+| RougeL | 0.1864        | 0.1823    |
+
+### T5 small model tuned on Covid Dataset
+|        | Before SimCLS | RoBERTa-8 | RoBERTa-16 | BERT-16 | ELECTRA-16 | xlm-roberta-16 | distilbert-16 | albert-16| deberta-16 |
+| ------ | ------------- | --------- | ---------- | ------- | ---------- | -------------- | ------------------ | -------------- | --------------- |
+| Rouge1 | 0.4266        | 0.4306    | 0.4145     | 0.4258  | 0.4173     | 0.4145         | 0.4269             | 0.4236         | 0.4171          |
+| Rouge2 | 0.2222        | 0.2077    | 0.2009     | 0.2099  | 0.2059     | 0.2009         | 0.2061             | 0.2067         | 0.1976          |
+| RougeL | 0.3659        | 0.3598    | 0.3454     | 0.3531  | 0.3486     | 0.3454         | 0.3543             | 0.3542         | 0.3465          |
+
+
+
+
+
+
