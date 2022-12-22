@@ -32,7 +32,7 @@ Need to know that the dataset in this repo [clean_covid.csv](clean_covid.csv) is
 
 - [The COVID-19 Open Research Dataset.](https://learn.microsoft.com/en-us/azure/open-datasets/dataset-covid-19-open-research?tabs=azure-storage)
 
-## 2. Generating candidates
+## 3. Generating candidates
 
 To generate candidates please run:
 ```
@@ -53,7 +53,7 @@ python preprocess.py --src_dir [path of the raw data] --tgt_dir [output path] --
 
 The preprocessing precedure will store the processed data as seperate json files in `tgt_dir`.
 
-## 3. scorer training
+## 4. scorer training
 
 ### Hyper-parameter Setting
 You may specify the hyper-parameters in `main.py`.
@@ -73,7 +73,7 @@ model path should be a subdirectory in the `./cache` directory, e.g. `cnndm/mode
 python evaluate_model.py --generator_name {args.generator_name} --dataset_name {args.dataset_name} --scorer_path cache/22-12-17-0/scorer.bin --dataset_percent 10
 ```
 
-## 4. Results
+## 5. Results
 
 <!-- ### RoBERTa scorer
 |          | ROUGE-1 | ROUGE-2 | ROUGE-L |
